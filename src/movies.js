@@ -134,7 +134,11 @@ function turnHoursToMinutes(moviesArray) {
 
 // BONUS - Iteration 8: Best yearly score average - Best yearly score average
 function bestYearAvg(moviesArray) {
-  console.log('INIT ARRAY', moviesArray);
+  // console.log('INIT ARRAY', moviesArray);
+
+  //  I.  Early returns for cases where:
+  //    1. Incoming array is empty.
+  //    2. Incoming array has only one movie.
   if (moviesArray.length === 0) return null;
   if (moviesArray.length === 1) {
     console.log(
@@ -143,51 +147,68 @@ function bestYearAvg(moviesArray) {
     return `The best year was ${moviesArray[0].year} with an average score of ${moviesArray[0].score}`;
   }
 
-  let copyArr = [...moviesArray];
+  //  II. Store all the values of 'year' of each movie in a new array:
+  const listAllYears = moviesArray.map(movie => movie.year);
+  // console.log('listAllYears --->', listAllYears);
 
+  //  III.  Filter in a new array the values of the years without repetitions. Each year appears once in here:
+  const uniqueYearsArr = listAllYears.filter(
+    (year, i) => listAllYears.indexOf(year) === i
+  );
+  // console.log('** uniqueYearsArr --->', uniqueYearsArr);
+
+  // let copyArr = [...moviesArray];
+
+  //  IV. Declare the variables that will hold the greatest average score and the year.
   let winningYear = 0;
-  let winningRate = 0;
+  let winningAvrgScore = 0;
 
-  copyArr.sort((a, b) => {
-    if (a.year - b.year === 0) {
-      let evalYear = a.year;
-      console.log('Current Year', evalYear);
+  //  V.  Start to loop the value of each year hold in the uniqueYearsArr array.
+  uniqueYearsArr.forEach(year => {
+    // console.log('** INSIDE forEach() **');
+    // console.log('** Year -->', year);
 
-      let moviesByYear = copyArr.filter(movie => movie.year === evalYear);
-      console.log('BY YEAR', moviesByYear);
+    //  V.I.  Apply a filter by the current year in order to group the movies in a new and temporal array:
+    let moviesByYear = moviesArray.filter(movie => movie.year === year);
+    // console.log('** Movies by year -->', year, moviesByYear);
 
-      let scores = moviesByYear.map(movie => {
-        if (typeof movie.score === 'number') {
-          return movie.score;
-        } else {
-          return 0;
-        }
-      });
-      console.log('SCORES', scores);
-
-      let yearAverageRate =
-        scores.reduce((curr, prev) => {
-          return curr + prev;
-        }, 0) / scores.length;
-
-      if (yearAverageRate > winningRate) {
-        winningRate = yearAverageRate;
-        winningYear = evalYear;
+    //  V.II: Loop through all the movies and check if its a number type or not. If not, assign the 0 value to that score in order to keep the count for the average calc. The scores are stored in a new array, the rest of the movie data is excluded.
+    let scores = moviesByYear.map(movie => {
+      if (typeof movie.score === 'number') {
+        return movie.score;
+      } else {
+        return 0;
       }
-      if (yearAverageRate === winningRate) {
-        if (winningYear - evalYear > 0) winningYear = evalYear;
-        console.log('winningYear', winningYear);
-        console.log('evalYear', evalYear);
-      }
-      // console.log('yearAverageRate', yearAverageRate);
+    });
+    // console.log('** Scores -->', scores);
+
+    //  V.III: Calculate the average score.
+    let yearAverageRate =
+      scores.reduce((curr, prev) => {
+        return curr + prev;
+      }, 0) / scores.length;
+    // console.log('** yearAverageRate -->', yearAverageRate);
+
+    //  V.IV: Determine if the current value is bigger that the global winning one. If this evaulates to true, it should be assigned as the new greatest average score as weel as its related year.
+    if (yearAverageRate > winningAvrgScore) {
+      winningAvrgScore = yearAverageRate;
+      winningYear = year;
+    }
+    //  V.V.
+    if (yearAverageRate === winningAvrgScore) {
+      if (winningYear - year > 0) winningYear = year;
+      // console.log('winningYear', winningYear);
+      // console.log('evalYear', year);
     }
   });
+
   console.log(
-    `The best year was ${winningYear} with an average score of ${winningRate}`
+    `The best year was ${winningYear} with an average score of ${winningAvrgScore}`
   );
-  return `The best year was ${winningYear} with an average score of ${winningRate}`;
+  return `The best year was ${winningYear} with an average score of ${winningAvrgScore}`;
 }
 
+/*
 let testArray = [
   { year: 2000, score: 10 },
   { year: 2000, score: 90 },
@@ -203,3 +224,4 @@ console.log('*******************');
 console.log('*******************');
 console.log('*******************');
 console.log('*******************');
+*/
